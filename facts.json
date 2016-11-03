@@ -1,0 +1,30 @@
+{
+  "people": {
+    "ido": [
+      {
+        "title": "is a backend programmer",
+        "subtitle": "he likes node",
+        "image": "",
+        "icon": ""
+      }
+    ],
+    "dors@ironsrc.com": [
+      {
+        "title": "is a viking",
+        "subtitle": "also loves penguins",
+        "image": "https://files.slack.com/files-pri/T064D2AKS-F2WTF1FGR/img_20161103_150728.jpg?pub_secret=fcc82a3e66"
+      }
+    ]
+  },
+  "rooms": {
+    "ironsrc.com_2d39323332393137383338@resource.calendar.google.com": [
+      {
+        "title": "conference room 1 is the biggest conf room in this floor",
+        "subtitle": "also loves penguins",
+        "image": "https://files.slack.com/files-pri/T064D2AKS-F2WTF1FGR/img_20161103_150728.jpg?pub_secret=fcc82a3e66"
+      }
+    ]
+  },
+  "events": {
+  }
+}
