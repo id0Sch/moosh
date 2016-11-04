@@ -18,8 +18,12 @@ const Application = ({location:{query}, children, Room:{data}}, {muiTheme})=> {
         display: '-moz-box',
         MozBoxOrient: 'vertical'
     };
+    let roomImages;
+    if (query.room) {
+        roomImages = _.get(_.find(data, {id: query.room}), 'images', []);
+    }
     return (
-        <div>
+        <div className="appContainer" style={{backgroundImage: `url(${roomImages[_.random(0, roomImages.length-1)]})`}}>
             <HeaderContainer roomId={query.room}/>
             {
                 query.room ?
