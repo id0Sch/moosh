@@ -24,7 +24,7 @@ const Application = ({location:{query}, children, Room:{data}}, {muiTheme})=> {
             {
                 query.room ?
                     <div style={{display: 'flex', justifyContent: 'space-around'}}>
-                        <div style={Object.assign({width: '40vw'}, style)}>
+                        <div style={Object.assign({maxWidth: '40vw'}, style)}>
                             <CurrentEventContainer roomId={query.room}/>
                             <FactsContainer roomId={query.room}/>
                         </div>

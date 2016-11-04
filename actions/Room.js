@@ -20,6 +20,7 @@ export const listenToRooms = () => (dispatch) => {
             // .filter((event)=>moment().isSame(event.start, 'day'))
                 .reduce((events, event, index, collection)=> {
                     event.creator = _.find(event.guests, {organizer: true});
+                    _.remove(event.guests, {organizer: true});
                     if (!event.creator.displayName) {
                         event.creator.displayName = _.get(event, 'creator.email')
                             .replace('@ironsrc.com', '')

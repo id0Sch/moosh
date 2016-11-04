@@ -31,9 +31,9 @@ const UpcomingEvent = ({currentEventId, event}) => {
     if (!event.freeTime) {
         let secondaryText = _.get(event.creator, 'displayName', '');
 
-        let numberOfGuests = _.size(event.guests) - 1;//-1 for the organizer
+        let numberOfGuests = _.size(event.guests);
         if (numberOfGuests > 0) {
-            secondaryText += ` and ${numberOfGuests} ${numberOfGuests == 1 ? 'more guest' : 'guests'}`;
+            secondaryText += ` and ${numberOfGuests == 1 ? _.first(event.guests).displayName : ` ${numberOfGuests} other guests`}`;
         }
         properties.secondaryText = secondaryText;
         properties.leftAvatar = (<Avatar src={_.get(event, 'creator.image')}/>);
