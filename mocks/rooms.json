@@ -10,42 +10,40 @@
     ],
     "schedule": [
       {
-        "creator": {
-          "image": "https://scontent.fsdv1-1.fna.fbcdn.net/v/t1.0-9/10940635_10205829199513342_802437695474419049_n.jpg?oh=8a569a87db297d32441972e4046faed1&oe=58CC95C5",
-          "name": "ido"
-        },
         "finish": 1478178000,
         "id": "mock-event",
         "name": "hackathon ideas",
         "start": 1478167200,
         "guests": [
           {
+            "image": "https://scontent.fsdv1-1.fna.fbcdn.net/v/t1.0-9/10940635_10205829199513342_802437695474419049_n.jpg?oh=8a569a87db297d32441972e4046faed1&oe=58CC95C5",
+            "organizer" : true,
+            "displayName": "ido"
+          },
+          {
             "image": "https://scontent.fsdv1-1.fna.fbcdn.net/t31.0-8/882605_10151492778104028_1629648166_o.jpg",
-            "name": "dor",
+            "displayName": "dor",
             "status": "Attending"
           },
           {
             "image": "https://scontent.fsdv1-1.fna.fbcdn.net/v/t1.0-1/c50.50.621.621/400434_10151085095700889_141505339_n.jpg?oh=941631a990e6a83807f0f9cf11cf343a&oe=589E1544",
-            "name": "sagi",
+            "displayName": "sagi",
             "status": "Not Attending"
           },
           {
             "image": "https://scontent.fsdv1-1.fna.fbcdn.net/v/l/t1.0-9/10421986_10204337716982431_1277407685489995846_n.jpg?oh=120dffa776705fbf7cd7f2cca73e1900&oe=589CE9B9",
-            "name": "yarkoni",
+            "displayName": "yarkoni",
             "status": "N/A"
           }
         ]
       },
       {
-        "creator": {
-          "image": "https://scontent.fsdv1-1.fna.fbcdn.net/t31.0-8/882605_10151492778104028_1629648166_o.jpg",
-          "name": "dor"
-        },
         "guests": [
           {
-            "image": "https://scontent.fsdv1-1.fna.fbcdn.net/v/t1.0-9/10940635_10205829199513342_802437695474419049_n.jpg?oh=8a569a87db297d32441972e4046faed1&oe=58CC95C5",
-            "name": "ido",
-            "status": "Not Attending"
+            "image": "https://scontent.fsdv1-1.fna.fbcdn.net/t31.0-8/882605_10151492778104028_1629648166_o.jpg",
+            "displayName": "dor",
+            "status": "Attending",
+            "organizer" : true
           }
         ],
         "finish": 1478180000,

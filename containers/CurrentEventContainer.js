@@ -25,20 +25,30 @@ class CurrentEventContainer extends Component {
             roomId
         } = this.props;
         let currentEvent;
+        let nextEventStartTime;
         let roomData = _.find(data, {id: roomId});
         if (roomData.currentEventId) {
-            currentEvent = _.find(roomData.schedule, {id: roomData.currentEventId})
+            currentEvent = _.find(roomData.schedule, {id: roomData.currentEventId});
+        }
+        if (!currentEvent) {
+            nextEventStartTime = _.get(roomData.schedule[0], 'start');
         }
         return (
 
-            <Card style={{height: '400px'}}>
+            <Card style={{height: '45vh'}}>
                 {
                     !hasReceivedData ?
                         <Loader active={true}/>
                         :
                         (_.isEmpty(roomData) || !currentEvent) ?
                             (<ListItem disabled={true} style={{textAlign: 'center'}}>
-                                <h2 style={{marginBottom: 0}}>Available until further notice!</h2>
+                                <h3 style={{marginBottom: 0}}>
+                                    Available until {
+                                        !!nextEventStartTime ?
+                                            moment(nextEventStartTime).format('HH:mm')
+                                            : '~further notice'
+                                    }!
+                                </h3>
                                 <TagFace style={{height: 'auto', width: '150px', color: '#4CAF50'}}/>
                             </ListItem>)
                             :
@@ -52,13 +62,13 @@ class CurrentEventContainer extends Component {
                                 <div>
                                     <Subheader>{currentEvent.guests.length} Guests</Subheader>
                                     <List style={{
-                                        display :'flex',
-                                        flexWrap:'wrap'
+                                        display: 'flex',
+                                        flexWrap: 'wrap'
                                     }}>
                                         {
                                             _.map(currentEvent.guests, (guest)=>(
                                                     <ListItem disabled={true}
-                                                              style={{paddingRight:'20px'}}
+                                                              style={{paddingRight: '20px'}}
                                                               primaryText={guest.displayName}
                                                               leftAvatar={<Avatar src={_.get(guest, 'image')}/>}
                                                               secondaryText={guest.responseStatus}/>

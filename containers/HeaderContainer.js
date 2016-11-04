@@ -17,7 +17,8 @@ import {AppBar} from 'material-ui';
 const Menu = ({rooms})=>(
     <IconMenu
         iconButtonElement={
-            <FlatButton label={moment().format('MMM DD, HH:mm')}/>
+            <FlatButton style={{color: 'white', verticalAlign: '-webkit-baseline-middle'}}
+                        label={moment().format('MMM DD, HH:mm')}/>
         }
         targetOrigin={{horizontal: 'right', vertical: 'top'}}
         anchorOrigin={{horizontal: 'right', vertical: 'top'}}

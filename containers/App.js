@@ -14,7 +14,7 @@ import Footer from '../components/Footer';
 
 const Application = ({location:{query}, children, Room:{data}}, {muiTheme})=> {
     let style = {
-        marginTop: '80px',
+        marginTop: '10vh',
         display: '-moz-box',
         MozBoxOrient: 'vertical'
     };
@@ -29,7 +29,8 @@ const Application = ({location:{query}, children, Room:{data}}, {muiTheme})=> {
                             <FactsContainer roomId={query.room}/>
                         </div>
                         <div style={style}>
-                            <UpcomingEventsContainer roomId={query.room}/>
+                            <UpcomingEventsContainer style={{height: '45vh', marginBottom: '10vh', overflowY: 'scroll'}}
+                                                     roomId={query.room}/>
                         </div>
                     </div>
                     : <div/>

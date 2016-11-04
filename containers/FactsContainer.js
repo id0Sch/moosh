@@ -2,21 +2,14 @@
  * Created by idoschachter on 11/08/2016.
  */
 'use strict';
-import moment from 'moment';
 import _ from 'lodash';
 import React, {Component, PropTypes} from 'react'
 
 import {connect} from 'react-redux'
 
 import {Table, TableBody, TableHeader, TableRow, TableRowColumn, TableHeaderColumn} from 'material-ui/Table';
-import TagFace from 'material-ui/svg-icons/image/tag-faces';
-import Avatar from 'material-ui/Avatar';
-import Subheader from 'material-ui/Subheader';
-import List from 'material-ui/List/List';
-import ListItem from 'material-ui/List/ListItem';
 import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
 
-import Loader from '../components/Loader';
 import Fact from '../components/Fact';
 
 class FactsContainer extends Component {
@@ -34,19 +27,16 @@ class FactsContainer extends Component {
                     .value();
             facts = facts.concat(guestsFacts);
         }
-        facts = facts.concat(_.get(Facts.data, 'rooms.' + Room.data.id));
+        facts = facts.concat(_.flatten(_.get(Facts.data, 'rooms.' + Room.data.id)));
         facts = _.shuffle(_.flatten(facts));
-        return (
-            <div style={{display: 'flex', justifyContent: 'space-around', marginTop: '80px',marginBottom: '80px'}}>
+        return facts.length ?
+            <div style={{display: 'flex', justifyContent: 'space-around', marginTop: '80px', marginBottom: '80px'}}>
                 <Card>
-                    {
-                        facts.length ?
-                            <Fact {...facts[0]}/>
-                            : <div/>
-                    }
+                    <Fact {...facts[0]}/>
                 </Card>
             </div>
-        );
+            : <div/>
+
     }
 }
 FactsContainer.contextTypes = {
