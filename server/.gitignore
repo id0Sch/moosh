@@ -1,0 +1,5 @@
+node_modules
+.idea
+client_secret.json
+config.json
+google-services.json

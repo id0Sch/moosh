@@ -1,0 +1,14 @@
+{
+  "name": "moosh-server",
+  "version": "0.0.1",
+  "description": "Moosh Server",
+  "license": "MIT",
+  "dependencies": {
+    "async": "^2.1.2",
+    "firebase": "^3.5.3",
+    "google-auth-library": "^0.9.9",
+    "googleapis": "^14.1.0",
+    "lodash": "^4.16.6",
+    "request": "^2.78.0"
+  }
+}
