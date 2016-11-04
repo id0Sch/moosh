@@ -6,7 +6,6 @@ import moment from 'moment';
 import React, {Component, PropTypes} from 'react'
 import {connect} from 'react-redux'
 import FlatButton from 'material-ui/FlatButton';
-import IconButton from 'material-ui/IconButton';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
 import {Link} from 'react-router'
@@ -21,38 +20,26 @@ const Menu = ({rooms})=>(
                         label={moment().format('MMM DD, HH:mm')}/>
         }
         targetOrigin={{horizontal: 'right', vertical: 'top'}}
-        anchorOrigin={{horizontal: 'right', vertical: 'top'}}
-    >
+        anchorOrigin={{horizontal: 'right', vertical: 'top'}}>
         {
-            _.map(rooms, (room)=> {
-                return <Link to={{pathname: "/", query: {room: room.id}}}><MenuItem key={room.id}
-                                                                                    primaryText={room.name}/></Link>;
-            })
+            _.map(rooms, (room)=> (
+                <Link key={room.id} to={{pathname: "/", query: {room: room.id}}}>
+                    <MenuItem key={room.id} primaryText={room.name}/>
+                </Link>))
         }
     </IconMenu>
 );
-class HeaderContainer extends Component {
-    render() {
-        const {
-            Room :{data},
-            roomId
-        } = this.props;
-        return (
-            <AppBar title={_.get(_.find(data, {id: roomId}), 'name')}
-                    style={{backgroundColor: '#607D8B'}}
-                    iconElementRight={<Menu rooms={data}/>}
-                    showMenuIconButton={false}
-            />
-        )
-    }
-}
+
+const HeaderContainer = ({currentRoom, allRooms})=> (
+    <AppBar title={_.get(currentRoom, 'name')}
+            style={{backgroundColor: '#607D8B'}}
+            iconElementRight={<Menu rooms={allRooms}/>}
+            showMenuIconButton={false}
+    />
+);
+
 HeaderContainer.contextTypes = {
     muiTheme: PropTypes.object
 };
 
-
-function mapStateToProps(state) {
-    const {Room} = state;
-    return {Room}
-}
-export default connect(mapStateToProps)(HeaderContainer);
+export default HeaderContainer;

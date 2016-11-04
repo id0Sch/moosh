@@ -2,16 +2,13 @@
 import moment from 'moment';
 import {database} from '../Firebase';
 import Events from '../Events'
-
+import uuid from 'node-uuid';
 const InventoryRef = database.ref('rooms');
 
 function createTitle({name, start, finish}) {
     return `${moment(start).format('HH:mm')} - ${moment(finish).format('HH:mm')}: ${_.capitalize(name)}`
 }
 
-function createLink(room, {name, start, finish}) {
-
-}
 export const listenToRooms = () => (dispatch) => {
     InventoryRef.off();
     InventoryRef.on('value', (snapshot) => {
@@ -34,13 +31,12 @@ export const listenToRooms = () => (dispatch) => {
                     if (index < collection.length - 1) {
                         if (event.finish !== collection[index + 1].start) {
                             let freeTimeEvent = {
-                                id: '---',
+                                id: uuid.v4(),
                                 name: 'Free time',
                                 freeTime: true,
                                 start: event.finish,
                                 finish: collection[index + 1].start
                             };
-                            freeTimeEvent.link = createLink(room, freeTimeEvent);
                             freeTimeEvent.title = createTitle(freeTimeEvent);
                             events.push(freeTimeEvent);
                         }
@@ -60,3 +56,8 @@ export const listenToRooms = () => (dispatch) => {
         });
     });
 };
+
+export const setCurrentRoom = (roomId)=> ({
+    type: Events.ROOMS_SELECT_CURRENT_ROOM,
+    roomId
+});

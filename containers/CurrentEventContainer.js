@@ -16,85 +16,63 @@ import List from 'material-ui/List/List';
 import ListItem from 'material-ui/List/ListItem';
 import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
 
-import Loader from '../components/Loader';
-
-class CurrentEventContainer extends Component {
-    render() {
-        const {
-            Room:{data, hasReceivedData},
-            roomId
-        } = this.props;
-        let currentEvent;
-        let nextEventStartTime;
-        let roomData = _.find(data, {id: roomId}) || {};
-        if (roomData.currentEventId) {
-            currentEvent = _.find(roomData.schedule, {id: roomData.currentEventId});
-        }
-        if (!currentEvent) {
-            nextEventStartTime = _.get(_.first(roomData.schedule), 'start');
-        }
-        return (
-
-            <Card style={{maxHeight: '45vh', height: '45vh', overflowY: 'hidden'}}>
-                {
-                    !hasReceivedData ?
-                        <Loader active={true}/>
-                        :
-                        (_.isEmpty(roomData) || !currentEvent) ?
-                            (<ListItem disabled={true} style={{textAlign: 'center'}}>
-                                <h3 style={{marginBottom: 0}}>
-                                    Available until {
-                                        !!nextEventStartTime ?
-                                            moment(nextEventStartTime).format('HH:mm')
-                                            : 'further notice'
-                                    }!
-                                </h3>
-                                <TagFace style={{height: 'auto', width: '150px', color: '#4CAF50'}}/>
-                            </ListItem>)
-                            :
-                            <div>
-                                <Subheader>Happening now</Subheader>
-                                <CardHeader
-                                    title={`${_.capitalize(currentEvent.name)}, ending at ${moment(currentEvent.finish).format('HH:mm')}`}
-                                    subtitle={`by ${_.get(currentEvent, 'creator.displayName')}`}
-                                    avatar={_.get(currentEvent, 'creator.image')}
-                                />
-                                <CardText>
-                                    <Subheader>{currentEvent.guests.length} Guests</Subheader>
-                                    <List style={{
-                                        display: 'flex',
-                                        flexWrap: 'wrap',
-                                        justifyContent: 'space-around',
-                                        overflowY: 'scroll',
-                                        maxHeight: '16vh'
-                                    }}>
-                                        {
-                                            _.map(currentEvent.guests, (guest)=>(
-                                                    <ListItem disabled={true}
-                                                              primaryText={guest.displayName}
-                                                              leftAvatar={<Avatar src={_.get(guest, 'image')}/>}
-                                                              secondaryText={guest.responseStatus}/>
-                                                )
-                                            )
-                                        }
-                                    </List>
-                                </CardText>
-                                {/*<CardText>*/}
-                                {/*{JSON.stringify(data)}*/}
-                                {/*</CardText>*/}
-                            </div>
-                }
-            </Card>
-        );
+const CurrentEventContainer = ({currentRoom})=> {
+    let currentEvent;
+    let nextEventStartTime;
+    if (currentRoom.currentEventId) {
+        currentEvent = _.find(currentRoom.schedule, {id: currentRoom.currentEventId});
     }
-}
+    if (!currentEvent) {
+        nextEventStartTime = _.get(_.first(currentRoom.schedule), 'start');
+    }
+    return (
+        <Card style={{maxHeight: '45vh', height: '45vh', overflowY: 'hidden'}}>
+            {
+                _.isEmpty(currentRoom) || !currentEvent ?
+                    (<ListItem disabled={true} style={{textAlign: 'center'}}>
+                        <h3 style={{marginBottom: 0}}>
+                            Available until {
+                            !!nextEventStartTime ?
+                                moment(nextEventStartTime).format('HH:mm')
+                                : 'further notice'
+                        }!
+                        </h3>
+                        <TagFace style={{height: 'auto', width: '150px', color: '#4CAF50'}}/>
+                    </ListItem>)
+                    :
+                    <div>
+                        <Subheader>Happening now</Subheader>
+                        <CardHeader
+                            title={`${_.capitalize(currentEvent.name)}, ending at ${moment(currentEvent.finish).format('HH:mm')}`}
+                            subtitle={`by ${_.get(currentEvent, 'creator.displayName')}`}
+                            avatar={_.get(currentEvent, 'creator.image')}
+                        />
+                        <CardText>
+                            <Subheader>{currentEvent.guests.length} Guests</Subheader>
+                            <List style={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                justifyContent: 'space-around',
+                                overflowY: 'scroll',
+                                maxHeight: '16vh'
+                            }}>
+                                {
+                                    _.map(currentEvent.guests, (guest)=>(
+                                            <ListItem disabled={true}
+                                                      primaryText={guest.displayName}
+                                                      leftAvatar={<Avatar src={_.get(guest, 'image')}/>}
+                                                      secondaryText={guest.responseStatus}/>
+                                        )
+                                    )
+                                }
+                            </List>
+                        </CardText>
+                    </div>
+            }
+        </Card>
+    );
+};
 CurrentEventContainer.contextTypes = {
     muiTheme: PropTypes.object
 };
-
-
-function mapStateToProps(state) {
-    const {Room} = state;
-    return {Room}
-}
-export default connect(mapStateToProps)(CurrentEventContainer);
+export default CurrentEventContainer;
