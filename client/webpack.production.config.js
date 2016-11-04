@@ -6,7 +6,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const credentials = require('./credentials.json');
 module.exports = {
     entry: {
-        'dist/bundle.js': './index',
+        'dist/bundle.js': './src/index',
         'vendor': ['react', 'redux', 'moment', 'material-ui', 'react-redux']
     },
     output: {

@@ -2,7 +2,6 @@ import _ from 'lodash';
 import {createStore, applyMiddleware} from 'redux'
 import thunkMiddleware from 'redux-thunk'
 
-import fetchMiddleware from '../middlewares/fetch';
 
 import rootReducer from '../reducers'
 import {loadState, saveState} from './localStorage';
@@ -13,7 +12,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 // const savedState = loadState();
 export default function configureStore(preloadedState) {
-    let middleware = [thunkMiddleware, fetchMiddleware];
+    let middleware = [thunkMiddleware];
     if (createLogger) {
         middleware.push(createLogger());
     }
