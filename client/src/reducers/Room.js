@@ -10,7 +10,8 @@ const INITIAL_STATE = {
     errorMessage: '',
     data: [],
     roomId: null,
-    currentRoom: {}
+    currentRoom: {},
+    currentImageIndex: 0
 };
 export default function Room(state = INITIAL_STATE, action) {
     switch (action.type) {
@@ -33,6 +34,10 @@ export default function Room(state = INITIAL_STATE, action) {
             return Object.assign({}, state, {
                 currentRoom: _.find(state.data, {id: action.roomId}),
                 roomId: action.roomId
+            });
+        case Events.ROOMS_SET_ROOM_IMAGE:
+            return Object.assign({}, state, {
+                currentImageIndex: _.random(0, _.get(state, 'currentRoom.images.length', 1) - 1)
             });
         default:
             return state;

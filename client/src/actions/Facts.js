@@ -19,3 +19,8 @@ export const listenToFacts = () => (dispatch) => {
         });
     });
 };
+
+
+export const refreshFact = () => ({
+    type: Events.FACTS_SET_FACT_INDEX
+});

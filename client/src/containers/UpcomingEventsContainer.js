@@ -41,6 +41,8 @@ const UpcomingEvent = ({currentEventId, event}) => {
             marginLeft: '80%',
             marginTop: '-4%'
         }}><QRCode size={70} fgColor={green900} bgColor={green300} value={event.link}/></div>
+
+        // properties.secondaryText = event.link;
     }
     return event.id !== currentEventId ? <ListItem {...properties}/> : <div/>;
 };
@@ -50,7 +52,7 @@ const UpcomingEventsContainer = ({style, currentRoom})=> {
 
     if (!_.isEmpty(currentRoom.schedule)) {
         element = <div>
-            <Subheader>Upcoming</Subheader>
+            <Subheader style={{paddingBottom: '-20px'}}>Upcoming</Subheader>
             <List style={style}>
                 {
                     _.map(currentRoom.schedule, (event)=>

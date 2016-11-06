@@ -12,27 +12,19 @@ import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'mat
 
 import Fact from '../components/Fact';
 
-const FactsContainer = ({Facts, currentRoom})=> {
-    let facts = [];
-    if (currentRoom.currentEventId) {
-        let guestsFacts =
-            _.chain(Room.data.schedule).find({id: Room.data.currentEventId}).get('guests').map('displayName')
-                .map((guest)=>_.get(Facts.data, 'people.' + guest))
-                .compact()
-                .value();
-        facts = facts.concat(guestsFacts);
+class FactsContainer extends Component {
+    render() {
+        const {Facts:{data, currentFactIndex}} = this.props;
+        return data.length ?
+            <div style={{display: 'flex', justifyContent: 'space-around', marginTop: '80px', marginBottom: '80px'}}>
+                <Card style={{width: '31vw'}}>
+                    <Fact {...data[currentFactIndex]}/>
+                </Card>
+            </div>
+            : <div/>
     }
-    facts = facts.concat(_.flatten(_.get(Facts.data, 'rooms.' + currentRoom.id)));
-    facts = _.shuffle(_.flatten(facts));
-    return facts.length ?
-        <div style={{display: 'flex', justifyContent: 'space-around', marginTop: '80px', marginBottom: '80px'}}>
-            <Card>
-                <Fact {...facts[0]}/>
-            </Card>
-        </div>
-        : <div/>
+}
 
-};
 FactsContainer.contextTypes = {
     muiTheme: PropTypes.object
 };

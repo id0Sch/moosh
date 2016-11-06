@@ -2,9 +2,8 @@
  * Created by idoschachter on 11/08/2016.
  */
 'use strict';
-import moment from 'moment';
 import React, {Component, PropTypes} from 'react'
-import {connect} from 'react-redux'
+
 import FlatButton from 'material-ui/FlatButton';
 import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
@@ -13,11 +12,11 @@ import {Link} from 'react-router'
 import {AppBar} from 'material-ui';
 
 
-const Menu = ({rooms})=>(
+const Menu = ({rooms,currentTime})=>(
     <IconMenu
         iconButtonElement={
             <FlatButton style={{color: 'white', verticalAlign: '-webkit-baseline-middle'}}
-                        label={moment().format('MMM DD, HH:mm')}/>
+                        label={currentTime}/>
         }
         targetOrigin={{horizontal: 'right', vertical: 'top'}}
         anchorOrigin={{horizontal: 'right', vertical: 'top'}}>
@@ -30,10 +29,10 @@ const Menu = ({rooms})=>(
     </IconMenu>
 );
 
-const HeaderContainer = ({currentRoom, allRooms})=> (
+const HeaderContainer = ({currentRoom, allRooms, currentTime})=> (
     <AppBar title={_.get(currentRoom, 'name')}
             style={{backgroundColor: '#607D8B'}}
-            iconElementRight={<Menu rooms={allRooms}/>}
+            iconElementRight={<Menu currentTime={currentTime} rooms={allRooms}/>}
             showMenuIconButton={false}
     />
 );

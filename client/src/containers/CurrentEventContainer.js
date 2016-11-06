@@ -48,11 +48,10 @@ const CurrentEventContainer = ({currentRoom})=> {
                             avatar={_.get(currentEvent, 'creator.image')}
                         />
                         <CardText>
-                            <Subheader>{currentEvent.guests.length} Guests</Subheader>
+                            <Subheader style={{marginBottom:'-20px'}}>{currentEvent.guests.length} Guests</Subheader>
                             <List style={{
                                 display: 'flex',
                                 flexWrap: 'wrap',
-                                justifyContent: 'space-around',
                                 overflowY: 'scroll',
                                 maxHeight: '16vh'
                             }}>
