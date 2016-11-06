@@ -5,25 +5,28 @@ import {database} from '../Firebase';
 import Events from '../Events'
 import uuid from 'node-uuid';
 import Promise from 'bluebird';
-import fetch from 'isomorphic-fetch'
+import Bitly from '../utils/bitly'
 
 const InventoryRef = database.ref('rooms');
 const CALENDAR_TEMPLATE = 'https://calendar.google.com/calendar/render?action=TEMPLATE&add=[ROOM_ID]&dates=[START]/[FINISH]';
 const CALENDAR_TIMESTAMP = 'YYYYMMDDTHHmm02';
+
+const bitly = new Bitly(process.env.BITLY_CRED);
+
 function createTitle({name, start, finish}) {
     return `${moment(start).format('HH:mm')} - ${moment(finish).format('HH:mm')}: ${_.capitalize(name)}`
 }
-function createLink(room, {name, start, finish}) {
-    let shortUrl = CALENDAR_TEMPLATE
-            .replace('[ROOM_ID]', room.id)
+function createLink(roomId, {start, finish}) {
+    let longUrl = CALENDAR_TEMPLATE
+            .replace('[ROOM_ID]', roomId)
             .replace('[START]', moment(start).format(CALENDAR_TIMESTAMP))
             .replace('[FINISH]', moment(finish).format(CALENDAR_TIMESTAMP))
         ;
-    shortUrl = encodeURIComponent(shortUrl);
-    return fetch(`https://api-ssl.bitly.com/v3/shorten?access_token=${process.env.BITLY_CRED}&shortUrl=${shortUrl}`)
-    // .then(response=>console.log(response))
-        .then((response)=>response.json())
-        .then(response=>_.get(response, 'data.url'))
+    if (process.env.NODE_ENV !== 'production') {
+        return Promise.resolve(longUrl);
+    } else {
+        return bitly.shorten(longUrl);
+    }
 }
 export const listenToRooms = () => (dispatch) => {
     InventoryRef.off();
@@ -54,9 +57,8 @@ export const listenToRooms = () => (dispatch) => {
                                 finish: collection[index + 1].start
                             };
                             freeTimeEvent.title = createTitle(freeTimeEvent);
-                            return createLink(room, freeTimeEvent)
+                            return createLink(room.id, freeTimeEvent)
                                 .then((link)=> {
-                                    console.log(link);
                                     freeTimeEvent.link = link;
                                     events.push(freeTimeEvent);
                                     return resolve(events);

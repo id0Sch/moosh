@@ -3,19 +3,18 @@
  */
 'use strict';
 import _ from 'lodash';
-import Promise from 'bluebird';
-import fetch from 'isomorphic-fetch'
-import co from 'co';
+import fetch from 'isomorphic-fetch';
 
-class bitly {
-    constructor() {
-
+class Bitly {
+    constructor(accessToken) {
+        this.accessToken = accessToken;
     }
 
-    shorten(url) {
-        return fetch(`https://api-ssl.bitly.com/v3/shorten?access_token=${process.env.BITLY_CRED}&shortUrl=${url}`)
+    shorten(longUrl) {
+        return fetch(`https://api-ssl.bitly.com/v3/shorten?access_token=${this.accessToken}&longUrl=${encodeURIComponent(longUrl)}`)
         // .then(response=>console.log(response))
             .then((response)=>response.json())
             .then(response=>_.get(response, 'data.url'))
     }
 }
+export default Bitly;
