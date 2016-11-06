@@ -21,6 +21,9 @@ class Application extends Component {
         if (query.hasOwnProperty('room')) {
             setCurrentRoom(query.room);
         }
+        // setInterval(()=> {
+        //
+        // }, 500)
     }
 
     componentWillReceiveProps(nextProps) {

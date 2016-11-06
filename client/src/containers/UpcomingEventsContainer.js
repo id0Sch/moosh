@@ -8,8 +8,9 @@ import {connect} from 'react-redux'
 
 import Subheader from 'material-ui/Subheader';
 import Avatar from 'material-ui/Avatar';
-import {white, green500, green300,green900} from 'material-ui/styles/colors';
+import {white, green500, green300, green900} from 'material-ui/styles/colors';
 
+import QRCode from 'qrcode.react';
 import List from 'material-ui/List/List';
 import ListItem from 'material-ui/List/ListItem';
 import Paper from 'material-ui/Paper';
@@ -35,11 +36,11 @@ const UpcomingEvent = ({currentEventId, event}) => {
         properties.secondaryText = secondaryText;
         properties.leftAvatar = (<Avatar src={_.get(event, 'creator.image')}/>);
     } else {
-        // properties.secondaryText = <div style={{
-        //     height:'100%',
-        //     marginLeft: '80%',
-        //     marginTop: '-4%'
-        // }}><QRCode size={70} fgColor={green900} bgColor={green300} value={event.link}/></div>
+        properties.secondaryText = <div style={{
+            height: '100%',
+            marginLeft: '80%',
+            marginTop: '-4%'
+        }}><QRCode size={70} fgColor={green900} bgColor={green300} value={event.link}/></div>
     }
     return event.id !== currentEventId ? <ListItem {...properties}/> : <div/>;
 };

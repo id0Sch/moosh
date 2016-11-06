@@ -8,13 +8,15 @@ const InventoryRef = database.ref('rooms');
 function createTitle({name, start, finish}) {
     return `${moment(start).format('HH:mm')} - ${moment(finish).format('HH:mm')}: ${_.capitalize(name)}`
 }
-
+function createLink(room, {name, start, finish}) {
+    return name;
+}
 export const listenToRooms = () => (dispatch) => {
     InventoryRef.off();
     InventoryRef.on('value', (snapshot) => {
         let rooms = _.map(snapshot.val(), (room)=> {
             room.schedule = _.chain(room.schedule)
-            // .filter((event)=>moment().isSame(event.start, 'day'))
+                .filter((event)=>moment().isSame(event.start, 'day'))
                 .reduce((events, event, index, collection)=> {
                     event.creator = _.find(event.guests, {organizer: true});
                     _.remove(event.guests, {organizer: true});
@@ -38,6 +40,7 @@ export const listenToRooms = () => (dispatch) => {
                                 finish: collection[index + 1].start
                             };
                             freeTimeEvent.title = createTitle(freeTimeEvent);
+                            freeTimeEvent.link = createLink(room, freeTimeEvent);
                             events.push(freeTimeEvent);
                         }
                     }
