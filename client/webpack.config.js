@@ -20,6 +20,7 @@ module.exports = {
                 FIREBASE_API_KEY: JSON.stringify(credentials.FIREBASE_API_KEY),
                 FIREBASE_AUTH_DOMAIN: JSON.stringify(credentials.FIREBASE_AUTH_DOMAIN),
                 FIREBASE_DB: JSON.stringify(credentials.FIREBASE_DB),
+                BITLY_CRED: JSON.stringify(credentials.BITLY_CRED),
 
                 SAVE_STATE: false,
                 VERSION: JSON.stringify(require("./package.json").version),

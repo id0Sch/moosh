@@ -7,7 +7,6 @@ import uuid from 'node-uuid';
 import Promise from 'bluebird';
 import fetch from 'isomorphic-fetch'
 
-
 const InventoryRef = database.ref('rooms');
 const CALENDAR_TEMPLATE = 'https://calendar.google.com/calendar/render?action=TEMPLATE&add=[ROOM_ID]&dates=[START]/[FINISH]';
 const CALENDAR_TIMESTAMP = 'YYYYMMDDTHHmm02';
@@ -20,17 +19,19 @@ function createLink(room, {name, start, finish}) {
             .replace('[START]', moment(start).format(CALENDAR_TIMESTAMP))
             .replace('[FINISH]', moment(finish).format(CALENDAR_TIMESTAMP))
         ;
-    return shortUrl;
-    // return fetch(`https://api-ssl.bitly.com/v3/shorten?access_token=${process.env.BITLY_CRED}&format=text&shortUrl=${shortUrl}`)
-    //     .then((response)=>response.json());
+    shortUrl = encodeURIComponent(shortUrl);
+    return fetch(`https://api-ssl.bitly.com/v3/shorten?access_token=${process.env.BITLY_CRED}&shortUrl=${shortUrl}`)
+    // .then(response=>console.log(response))
+        .then((response)=>response.json())
+        .then(response=>_.get(response, 'data.url'))
 }
 export const listenToRooms = () => (dispatch) => {
     InventoryRef.off();
     InventoryRef.on('value', function (snapshot) {
-        let rooms = _.map(snapshot.val(), function (room) {
-            console.log(room.id);
+        return Promise.map(snapshot.val(), function (room) {
             room.schedule = _.filter(room.schedule, (event)=>moment().isSame(event.start, 'day'));
-            room.schedule = _.reduce(room.schedule, function (events, event, index, collection) {
+            return Promise.reduce(room.schedule, function processEvent(events, event, index) {
+                let collection = room.schedule;
                 event.creator = _.find(event.guests, {organizer: true});
                 _.remove(event.guests, {organizer: true});
                 if (!event.creator.displayName) {
@@ -42,29 +43,41 @@ export const listenToRooms = () => (dispatch) => {
                 event.name = _.capitalize(event.name);
                 event.title = createTitle(event);
                 events.push(event);
-
-                if (index < collection.length - 1) {
-                    if (event.finish !== collection[index + 1].start) {
-                        let freeTimeEvent = {
-                            id: uuid.v4(),
-                            name: 'Free time',
-                            freeTime: true,
-                            start: event.finish,
-                            finish: collection[index + 1].start
-                        };
-                        freeTimeEvent.title = createTitle(freeTimeEvent);
-                        freeTimeEvent.link = createLink(room, freeTimeEvent);
-                        events.push(freeTimeEvent);
+                return new Promise((resolve, reject)=> {
+                    if (index < collection.length - 1) {
+                        if (event.finish !== collection[index + 1].start) {
+                            let freeTimeEvent = {
+                                id: uuid.v4(),
+                                name: 'Free time',
+                                freeTime: true,
+                                start: event.finish,
+                                finish: collection[index + 1].start
+                            };
+                            freeTimeEvent.title = createTitle(freeTimeEvent);
+                            return createLink(room, freeTimeEvent)
+                                .then((link)=> {
+                                    console.log(link);
+                                    freeTimeEvent.link = link;
+                                    events.push(freeTimeEvent);
+                                    return resolve(events);
+                                }).catch(err=> {
+                                    console.error(err);
+                                    reject(err)
+                                });
+                        } else {
+                            return resolve(events);
+                        }
+                    } else {
+                        return resolve(events);
                     }
-                }
-                return events;
-            }, []);
-            return room;
-        });
-        dispatch({
-            type: Events.ROOMS_RECEIVE_DATA,
-            data: rooms || []
-        });
+                })
+            }, [])
+                .then((schedule)=> {
+                    room.schedule = schedule;
+                    return room;
+                });
+        }).then((rooms)=>dispatch({type: Events.ROOMS_RECEIVE_DATA, data: rooms || []}));
+
     }, (error) => {
         dispatch({
             type: Events.ROOMS_RECEIVE_DATA_ERROR,

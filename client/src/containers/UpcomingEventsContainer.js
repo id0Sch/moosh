@@ -44,7 +44,6 @@ const UpcomingEvent = ({currentEventId, event}) => {
 
         // properties.secondaryText = event.link;
     }
-    console.log(event.id, currentEventId);
     return event.id !== currentEventId ? <ListItem {...properties}/> : <div/>;
 };
 
