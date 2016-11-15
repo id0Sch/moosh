@@ -44,6 +44,7 @@ const UpcomingEvent = ({currentEventId, event}) => {
 
         // properties.secondaryText = event.link;
     }
+    console.log(event.id, currentEventId);
     return event.id !== currentEventId ? <ListItem {...properties}/> : <div/>;
 };
 
@@ -56,7 +57,7 @@ const UpcomingEventsContainer = ({style, currentRoom})=> {
             <List style={style}>
                 {
                     _.map(currentRoom.schedule, (event)=>
-                        <UpcomingEvent key={event.id} currentEventsId={currentRoom.currentEventId} event={event}/>
+                        <UpcomingEvent key={event.id} currentEventId={currentRoom.currentEventId} event={event}/>
                     )
                 }
             </List>
