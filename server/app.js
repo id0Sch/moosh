@@ -142,8 +142,15 @@ function getCurrentEvent(events) {
     var firstEvent = events[0];
 
     var firstEventStart = Date.parse(firstEvent['start']['dateTime']);
+    var firstEventEnd = Date.parse(firstEvent['end']['dateTime']);
+
     // Check if the event is now
     var now = Date.parse((new Date()).toISOString());
+
+    if(firstEventEnd < now) {
+        firstEvent = events[1];
+        firstEventStart = Date.parse(firstEvent['start']['dateTime']);
+    }
 
     return (firstEventStart < now ? firstEvent['id'] : null);
 }
@@ -159,6 +166,139 @@ function getAtendeeImage(attendee, cb) {
         }
         cb(config['defaultPhoto']);
     });
+}
+
+function processFacts(people, calendar, auth, callback) {
+    var attendees = {};
+    var date = new Date(), y = date.getFullYear(), m = date.getMonth();
+    var startDate = new Date(y, m, 1);
+    var endDate = new Date(y, m + 1, 0);
+
+    var rooms = config["rooms"];
+    async.map(rooms,
+        function (room, cb) {
+            calendar.events.list({
+                    auth: auth,
+                    calendarId: room.id,
+                    timeMin: startDate.toISOString(),
+                    timeMax: endDate.toISOString(),
+                    maxResults: 500,
+                    singleEvents: true,
+                    orderBy: 'startTime'
+                },
+                function (err, response) {
+                    if (err) {
+                        console.log('The API returned an error: ' + err);
+                        cb(err);
+                    }
+                    console.log('Processing room %s', response.summary);
+                    var events = response.items;
+                    if (events.length == 0) {
+                        console.log('No upcoming events found.');
+                        console.log('Done processing room %s', response.summary);
+                        cb();
+                    } else {
+                        console.log('Processing %s events', events.length);
+                        // Iterate over all events and create a list of all unique attendees in all events
+                        var schedule = [];
+                        async.eachSeries(events,
+                            function (event, cb) {
+                                console.log('Processing event %s', event.summary);
+                                var duration = (new Date(event.end.dateTime) - new Date(event.start.dateTime)) / (1000 * 60 * 60);
+                                // Go over all event attendees and process
+                                async.each(event.attendees,
+                                    function (attendee, cb2) {
+                                        // Don't add the meeting room itself
+                                        if (attendee.email != room['id']) {
+                                            attendeeEmail = attendee['email'];
+                                            if (attendees[attendeeEmail]) {
+                                                attendees[attendeeEmail]["count"]++;
+                                                attendees[attendeeEmail]["time"] += duration;
+                                            } else {
+                                                attendees[attendeeEmail] = {
+                                                    count: 1,
+                                                    time: duration
+                                                };
+                                            }
+                                        }
+                                        cb2();
+                                    },
+                                    function () {
+                                        console.log('Done processing event %s', event.summary);
+                                        cb();
+                                    });
+                            },
+                            function () {
+                                console.log('Done processing room %s', response.summary);
+                                cb();
+                            }
+                        );
+                    }
+                });
+        },
+        function (err, res) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+
+            var attendeesArray = [];
+            _.forEach(attendees, function(value, key) {
+                attendeesArray.push({email: key, count: value["count"], time: value["time"]});
+            });
+
+            attendeesArray = _.reverse(_.sortBy(attendeesArray, ['count']));
+
+            var facts = [];
+            var subtitleTexts = ["OMG!!!", "Wow!", "Holy S#&#!", "Damn!", "Gosh!?!"];
+            var meeters = _.take(attendeesArray, 10);
+            _.each(meeters, function(meeter, index) {
+                var personData = people[attendeesArray[index]["email"]];
+                var titleText = "most";
+                if(index == 1) {
+                    titleText = "2nd " + titleText;
+                } else if(index == 2) {
+                    titleText = "3rd " + titleText;
+                } else {
+                    titleText = (index+1) + "th " + titleText;
+                }
+
+                facts.push({
+                    icon: personData["image"],
+                    title: personData["displayName"] + " has the " + titleText + " meetings this month",
+                    subtitle: _.sample(subtitleTexts) + " " + personData["displayName"].split(' ')[0] + " has " + attendeesArray[index]["count"] +
+                    " meetings this month"
+                });
+            });
+
+            attendeesArray = _.reverse(_.sortBy(attendeesArray, ['time']));
+            meeters = _.take(attendeesArray, 10);
+            _.each(meeters, function(meeter, index) {
+                var personData = people[attendeesArray[index]["email"]];
+                var titleText = "most";
+                if(index == 1) {
+                    titleText = "2nd " + titleText;
+                } else if(index == 2) {
+                    titleText = "3rd " + titleText;
+                } else {
+                    titleText = (index+1) + "th " + titleText;
+                }
+
+                facts.push({
+                    icon: personData["image"],
+                    title: personData["displayName"] + " spends the " + titleText + " time in meetings this month",
+                    subtitle: _.sample(subtitleTexts) + " " + personData["displayName"].split(' ')[0] + " spends " + attendeesArray[index]["time"] +
+                    " hours in meetings this month"
+                });
+            });
+
+            // Add the remote facts.
+            facts = facts.concat(config.facts);
+
+            callback(facts);
+
+        }
+    );
 }
 
 /**
@@ -177,8 +317,8 @@ function processEvents(auth) {
         calendar.events.list({
             auth: auth,
             calendarId: room.id,
-            timeMin: startOfDay.toISOString(),
-            timeMax: new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000).toISOString(),
+            timeMin: now.toISOString(),
+            timeMax: new Date(startOfDay.getTime() + 72 * 60 * 60 * 1000).toISOString(),
             maxResults: 100,
             singleEvents: true,
             orderBy: 'startTime'
@@ -236,12 +376,12 @@ function processEvents(auth) {
                             },
                             function () {
                                 // Remove the meeting remove from the list of attendees
-                                _.remove(event.attendees, function(attendee) {
+                                _.remove(event.attendees, function (attendee) {
                                     return attendee.email == room['id'];
                                 });
 
                                 mapEvent(event, function (res) {
-                                    if(res.start > Date.parse((new Date()).toISOString())) {
+                                    if (res.finish > Date.parse((new Date()).toISOString())) {
                                         schedule.push(res);
                                     }
 
@@ -275,9 +415,16 @@ function processEvents(auth) {
 
         var db = firebase.database();
         var ref = db.ref("/rooms");
-        ref.set(res).then(function() {
-            console.log('Done processing');
-            process.exit();
+        ref.set(res).then(function () {
+            console.log('Done processing rooms');
+            processFacts(attendees, calendar, auth, function(facts) {
+                console.log('Storing Facts');
+                var ref = db.ref("/facts");
+                ref.set(facts).then(function () {
+                    console.log('Done processing');
+                    process.exit();
+                });
+            });
         });
     });
 }
